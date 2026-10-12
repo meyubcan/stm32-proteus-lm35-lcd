@@ -1,12 +1,16 @@
-# Proteus'ta STM32 simülasyonu: LM35 ile sıcaklık ölçüp LCD'ye yazma
+# STM32 in Proteus: LM35 thermometer with a 16x2 LCD
 
-> [TECH-OHM](https://tech-ohm.com) açık kaynak projesi
+STM32F401 · simulation · CubeIDE to Proteus workflow
 
-Kart olmadan STM32 denemek isteyenler için bir örnek. Kod STM32CubeIDE'de yazılıyor, çıkan `.hex` dosyası Proteus'taki STM32F401RE modeline yükleniyor. LM35'ten okunan sıcaklık 16x2 LCD'de gösteriliyor.
+![MCU](https://img.shields.io/badge/MCU-STM32F401RE-03234B?logo=stmicroelectronics&logoColor=white) ![IDE](https://img.shields.io/badge/IDE-STM32CubeIDE-2ea44f) ![License](https://img.shields.io/badge/license-MIT-blue) [![TECH-OHM](https://img.shields.io/badge/by-TECH--OHM-FFD400)](https://tech-ohm.com)
 
-Aşağıda hem devrenin Proteus'ta nasıl kurulacağını hem de derlenen dosyanın işlemciye nasıl yükleneceğini anlattım.
+**English** | [Türkçe](README.tr.md) · An open-source project by [TECH-OHM](https://tech-ohm.com)
 
-## Blok diyagram
+An example for trying out STM32 without a board. The code is written in STM32CubeIDE and the resulting `.hex` file is loaded into the STM32F401RE model in Proteus. The temperature read from an LM35 is shown on a 16x2 LCD.
+
+Below I explain how to draw the circuit in Proteus and how to load the compiled file into the simulated MCU.
+
+## Block diagram
 
 ```mermaid
 flowchart LR
@@ -14,9 +18,9 @@ flowchart LR
     MCU -- "RS, E, D4-D7 (4 bit)" --> LCD[16x2 LCD, HD44780]
 ```
 
-## Bağlantılar
+## Connections
 
-| İşlemci pini | Bağlandığı yer |
+| MCU pin | Connects to |
 |---|---|
 | PA0 | LM35 VOUT |
 | PA6 | LCD RS |
@@ -26,59 +30,59 @@ flowchart LR
 | PA10 | LCD D6 |
 | PA14 | LCD D7 |
 
-LCD'nin RW ucu toprağa, VSS toprağa, VDD beslemeye gider. LM35'in +VS ucu beslemeye, GND ucu toprağa.
+LCD RW and VSS go to ground, VDD to supply. LM35 +VS goes to supply and GND to ground.
 
-## Proteus'ta devreyi kurma
+## Drawing the circuit in Proteus
 
-1. Yeni proje aç, şematik sayfasında `P` tuşuyla parça penceresini aç.
-2. Şu üç parçayı ekle: `STM32F401RE`, `LM016L` (16x2 LCD), `LM35`.
-3. Yukarıdaki tabloya göre bağla. Besleme ve toprak için soldaki terminal menüsünden `POWER` ve `GROUND` kullan.
-4. LM35'in üzerindeki oklarla simülasyon sırasında sıcaklığı değiştirebilirsin.
+1. Create a new project and press `P` on the schematic sheet to open the part picker.
+2. Add three parts: `STM32F401RE`, `LM016L` (16x2 LCD) and `LM35`.
+3. Wire them as in the table above. Use `POWER` and `GROUND` from the terminals menu on the left.
+4. During simulation, the arrows on the LM35 change the temperature.
 
-Proteus kütüphanesinde STM32F407 modeli yok, o yüzden proje F401RE ile kuruldu. Sürümüne göre F103 gibi başka modeller de bulunur, onlarda `.ioc` dosyasını o işlemciye göre yeniden oluşturman gerekir.
+The Proteus library has no STM32F407 model, which is why this project uses the F401RE. Depending on your version other models such as the F103 exist. For those you need to recreate the `.ioc` file for that MCU.
 
-## Kodu derleyip Proteus'a yükleme
+## Building and loading into Proteus
 
-1. STM32CubeIDE'de `File > Import > Existing Projects into Workspace` ile bu klasörü aç.
-2. Projeyi derle. `Debug` klasöründe `stm32-proteus-lm35-lcd.hex` oluşur.
-3. `.hex` çıkmıyorsa: proje üzerinde sağ tık, `Properties > C/C++ Build > Settings > MCU Post build outputs` altında `Convert to Intel Hex file` kutusunu işaretle.
-4. Proteus'ta işlemciye çift tıkla. `Program File` satırındaki klasör simgesinden bu `.hex` dosyasını seç.
-5. Sol alttaki oynat düğmesiyle simülasyonu başlat.
+1. In STM32CubeIDE use `File > Import > Existing Projects into Workspace` and open this folder.
+2. Build the project. `stm32-proteus-lm35-lcd.hex` appears in the `Debug` folder.
+3. If no `.hex` is produced: right-click the project, go to `Properties > C/C++ Build > Settings > MCU Post build outputs` and tick `Convert to Intel Hex file`.
+4. In Proteus double-click the MCU. Use the folder icon on the `Program File` line to select the `.hex` file.
+5. Start the simulation with the play button at the bottom left.
 
-Kodu her değiştirdiğinde yeniden derlemen yeterli. Proteus aynı dosyayı gösterdiği için simülasyonu durdurup başlatınca yeni kod çalışır.
+After that, rebuilding is enough whenever you change the code. Proteus points at the same file, so stopping and restarting the simulation runs the new code.
 
-## Hesap
+## The math
 
 ```
-gerilim  = ADC_VREF * adc / 4095
-sıcaklık = gerilim * 100        (LM35 derece başına 10 mV verir)
+voltage     = ADC_VREF * adc / 4095
+temperature = voltage * 100        (LM35 gives 10 mV per degree)
 ```
 
-Proteus'ta işlemcinin analog referansı besleme rayına bağlı ve bu ray varsayılan olarak 5 V. Bu yüzden `main.c` içinde `ADC_VREF` 5.0 olarak duruyor. Aynı kodu gerçek karta yükleyeceksen 3.3 yap.
+In Proteus the MCU's analog reference is tied to the supply rail, which is 5 V by default. That is why `ADC_VREF` in `main.c` is 5.0. Set it to 3.3 if you put the same code on a real board.
 
-## Gerçek kartta dikkat
+## On real hardware
 
-- PA14 gerçek işlemcide SWCLK pini. Simülasyonda sorun olmuyor ama kartta LCD D7'yi başka bir pine taşı, yoksa programlayıcı bağlanamaz.
-- `HAL_Delay` süreleri simülasyonda tutmuyorsa işlemcinin özelliklerinde saat frekansını 16 MHz yap. Kod dahili 16 MHz osilatöre göre ayarlı.
+- PA14 is the SWCLK pin on a real MCU. It causes no trouble in simulation, but on a board move LCD D7 to another pin or the programmer cannot connect.
+- If `HAL_Delay` timings look wrong in simulation, set the clock frequency in the MCU's properties to 16 MHz. The code is set up for the internal 16 MHz oscillator.
 
-## LCD sürücüsü
+## LCD driver
 
-`Core/Src/lcd.c` içinde HD44780 için 4 bit modda çalışan kısa bir sürücü var: `LCD_Init`, `LCD_Clear`, `LCD_SetCursor`, `LCD_SendString`. Pinler `lcd.h` içinde tanımlı, başka pine taşımak için sadece o dosyayı değiştir.
+`Core/Src/lcd.c` is a short HD44780 driver in 4-bit mode: `LCD_Init`, `LCD_Clear`, `LCD_SetCursor`, `LCD_SendString`. The pins are defined in `lcd.h`, so moving to other pins means editing only that file.
 
-## Durum
+## Status
 
-Ekran biçimini düzenledikten sonra simülasyonda yeniden çalıştırmadım.
+I changed the display formatting and have not re-run the simulation since.
 
-## Lisans
+## License
 
-MIT. `Drivers` klasöründeki STM32 HAL ve CMSIS dosyaları kendi lisanslarıyla gelir.
+MIT. The STM32 HAL and CMSIS files under `Drivers` keep their own licenses.
 
-## Yazar
+## Author
 
-Gömülü Sistem Mühendisi M. Eyüb Can, [TECH-OHM](https://tech-ohm.com) kurucusu
+M. Eyüb Can, embedded systems engineer and founder of [TECH-OHM](https://tech-ohm.com)
 
-## TECH-OHM
+## About TECH-OHM
 
-[TECH-OHM](https://tech-ohm.com) elektronik kart ve gömülü yazılım tasarlayan bir mühendislik firması. Fikirden seri üretime kadar tasarım işi alıyor, TECH-OHM Akademi'de 12 aylık gömülü sistem eğitimi ve şirketlere özel danışmanlık veriyor.
+[TECH-OHM](https://tech-ohm.com) designs electronic boards and embedded software, from the first schematic to series production. We also run a 12-month embedded systems training program and consult for engineering teams.
 
-Web: [tech-ohm.com](https://tech-ohm.com) · E-posta: info@tech-ohm.com
+Web: [tech-ohm.com](https://tech-ohm.com) · Email: info@tech-ohm.com
