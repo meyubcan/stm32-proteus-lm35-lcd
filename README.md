@@ -1,5 +1,7 @@
 # Proteus'ta STM32 simülasyonu: LM35 ile sıcaklık ölçüp LCD'ye yazma
 
+> [TECH-OHM](https://tech-ohm.com) açık kaynak projesi
+
 Kart olmadan STM32 denemek isteyenler için bir örnek. Kod STM32CubeIDE'de yazılıyor, çıkan `.hex` dosyası Proteus'taki STM32F401RE modeline yükleniyor. LM35'ten okunan sıcaklık 16x2 LCD'de gösteriliyor.
 
 Aşağıda hem devrenin Proteus'ta nasıl kurulacağını hem de derlenen dosyanın işlemciye nasıl yükleneceğini anlattım.
@@ -73,4 +75,10 @@ MIT. `Drivers` klasöründeki STM32 HAL ve CMSIS dosyaları kendi lisanslarıyla
 
 ## Yazar
 
-Gömülü Sistem Mühendisi M. Eyüb Can, [TECH-OHM](https://tech-ohm.com)
+Gömülü Sistem Mühendisi M. Eyüb Can, [TECH-OHM](https://tech-ohm.com) kurucusu
+
+## TECH-OHM
+
+[TECH-OHM](https://tech-ohm.com) elektronik kart ve gömülü yazılım tasarlayan bir mühendislik firması. Fikirden seri üretime kadar tasarım işi alıyor, TECH-OHM Akademi'de 12 aylık gömülü sistem eğitimi ve şirketlere özel danışmanlık veriyor.
+
+Web: [tech-ohm.com](https://tech-ohm.com) · E-posta: info@tech-ohm.com
