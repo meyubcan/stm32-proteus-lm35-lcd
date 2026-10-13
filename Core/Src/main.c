@@ -34,11 +34,11 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-/* Proteus'ta VDDA besleme rayina bagli ve varsayilan 5 V. Gercek kartta 3.3f yaz. */
+/* In Proteus VDDA is tied to the supply rail, 5 V by default. Use 3.3f on a real board. */
 #define ADC_VREF        5.0f
 #define ADC_FULL_SCALE  4095.0f
 #define LM35_C_PER_VOLT 100.0f   /* LM35: 10 mV/C */
-#define LCD_DEGREE      0xDF     /* HD44780 karakter tablosunda derece isareti */
+#define LCD_DEGREE      0xDF     /* degree sign in the HD44780 character table */
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -101,7 +101,7 @@ int main(void)
   LCD_Init();
   LCD_Clear();
   LCD_SetCursor(0, 0);
-  LCD_SendString("  ODA SICAKLIGI ");
+  LCD_SendString("ROOM TEMPERATURE");
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -120,7 +120,7 @@ int main(void)
     volt        = ADC_VREF * (float)adc_raw / ADC_FULL_SCALE;
     temperature = volt * LM35_C_PER_VOLT;
 
-    /* Satir hep 16 karakter, boylece eski yazinin kalintisi ekranda kalmaz */
+    /* The line is always 16 characters, so nothing of the old text stays on screen */
     snprintf(line2, sizeof(line2), "    %5.1f %cC    ", temperature, LCD_DEGREE);
     LCD_SetCursor(1, 0);
     LCD_SendString(line2);
